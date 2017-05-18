@@ -63,7 +63,7 @@ module StripeMock
           if coupon
             subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
           else
-            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
         end
 
@@ -106,7 +106,7 @@ module StripeMock
           if coupon
             subscription[:discount] = Stripe::Util.convert_to_stripe_object({ coupon: coupon }, {})
           else
-            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
         end
 
@@ -164,7 +164,7 @@ module StripeMock
           elsif coupon_id == ""
             subscription[:discount] = Stripe::Util.convert_to_stripe_object(nil, {})
           else
-            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', 400)
+            raise Stripe::InvalidRequestError.new("No such coupon: #{coupon_id}", 'coupon', http_status: 400)
           end
         end
 
@@ -219,7 +219,7 @@ module StripeMock
 
       def verify_card_present(customer, plan, subscription, params={})
         if customer[:default_source].nil? && customer[:trial_end].nil? && plan[:trial_period_days].nil? && plan[:amount] != 0 && plan[:trial_end].nil? && params[:trial_end].nil? && (subscription.nil? || subscription[:trial_end].nil? || subscription[:trial_end] == 'now')
-          raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, 400)
+          raise Stripe::InvalidRequestError.new('You must supply a valid card xoxo', nil, http_status: 400)
         end
       end
 
@@ -228,7 +228,7 @@ module StripeMock
 
         if status == 'canceled'
           message = "No such subscription: #{id}"
-          raise Stripe::InvalidRequestError.new(message, 'subscription', 404)
+          raise Stripe::InvalidRequestError.new(message, 'subscription', http_status: 404)
         end
       end
     end

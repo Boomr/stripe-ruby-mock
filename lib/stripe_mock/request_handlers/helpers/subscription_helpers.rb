@@ -6,6 +6,15 @@ module StripeMock
         customer[:subscriptions][:data].find{|sub| sub[:id] == sub_id }
       end
 
+      def custom_subscription_multiple_plan_params(items, cus, options={})
+        start_time = options[:current_period_start] || Time.now.utc.to_i
+        params = { items: items, customer: cus[:id], current_period_start: start_time }
+        params.merge! options.select {|k,v| k =~ /application_fee_percent|quantity|metadata|tax_percent/}
+        # TODO: Implement coupon logic
+
+        params
+      end
+
       def custom_subscription_params(plan, cus, options = {})
         verify_trial_end(options[:trial_end]) if options[:trial_end]
 

@@ -7,6 +7,28 @@ shared_examples 'Customer Subscriptions' do
   end
 
   context "creating a new subscription" do
+    it "correctly handles a subscription with multiple plans", :live => true do
+      plan1 = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
+      plan2 = stripe_helper.create_plan(id: 'silver_addon', name: 'Silver Plan Add-On', amount: 2000, currency: 'usd')
+      customer = Stripe::Customer.create(source: gen_card_tk)
+
+      expect(customer.subscriptions.data).to be_empty
+      expect(customer.subscriptions.count).to eq(0)
+
+      items = [
+        {plan: 'silver'},
+        {plan: 'silver_addon'}
+      ]
+
+      sub = Stripe::Subscription.create({items: items, customer: customer.id, metadata: { foo: "bar", example: "yes" }})
+
+      expect(sub.object).to eq('subscription')
+
+      customer = Stripe::Customer.retrieve(customer.id)
+      expect(customer.subscriptions.data).to_not be_empty
+      expect(customer.subscriptions.count).to eq(1)
+    end
+
     it "adds a new subscription to customer with none", :live => true do
       plan = stripe_helper.create_plan(id: 'silver', name: 'Silver Plan', amount: 4999, currency: 'usd')
       customer = Stripe::Customer.create(source: gen_card_tk)
